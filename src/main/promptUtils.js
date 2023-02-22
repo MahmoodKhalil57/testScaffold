@@ -35,7 +35,7 @@ async function customPrompts() {
   let uiFramwork = "None"
 
   const { is } = await inquirer.prompt({
-    name: "isStupid",
+    name: "is",
     type: "list",
     message: "Javascript or Typescript?",
     choices: [
