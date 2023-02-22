@@ -1,6 +1,6 @@
 {
   "name": "create-test-scaffold",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "this is a test",
   "type": "module",
   "keywords": [],
@@ -10,7 +10,7 @@
     "test:install": "pnpm i -g --force && pnpm create test-scaffold"
   },
   "bin": {
-    "create-test-scaffold": "bin/index.js"
+    "test-scaffold": "bin/index.js"
   },
   "dependencies": {
     "chalk": "^5.2.0",

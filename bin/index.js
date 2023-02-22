@@ -1,5 +1,5 @@
 #! /usr/bin/env node
-import cli from '../src/cli.js'
+import cli from '../src/main/cli.js'
 import fs from 'node:fs'
 import path from 'path'
 import url from 'url'

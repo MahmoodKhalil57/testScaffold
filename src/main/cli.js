@@ -1,13 +1,3 @@
-import chalk from 'chalk'
-import inquirer from 'inquirer'
-import gradient from 'gradient-string'
-import chalkAnimation from 'chalk-animation'
-import figlet from 'figlet'
-import { createSpinner } from 'nanospinner'
-import { exec } from 'child_process';
-
-import crypto from "node:crypto"
-
 import promptUtils from './promptUtils.js'
 import createUtils from './createUtils.js'
 
