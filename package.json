@@ -1,6 +1,6 @@
 {
   "name": "create-test-scaffold",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "this is a test",
   "type": "module",
   "keywords": [],
@@ -19,5 +19,9 @@
     "gradient-string": "^2.0.2",
     "inquirer": "^9.1.4",
     "nanospinner": "^1.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MahmoodKhalil57/testScaffold"
   }
 }
