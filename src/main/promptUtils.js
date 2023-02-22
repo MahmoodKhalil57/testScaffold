@@ -75,7 +75,7 @@ async function customPrompts() {
   })
   cssFramework = cf
 
-  if (cf === "TwailwindCss") {
+  if (cf === "TailwindCss") {
     const { uf } = await inquirer.prompt({
       name: "uf",
       type: "list",

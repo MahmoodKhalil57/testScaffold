@@ -32,7 +32,7 @@ const cli = {
       schema.css.framework = cssFramework
       schema.css.ui = uiFramwork
     }
-    else if (isCustom) {
+    else {
       let { isStupid, apiArray, cssFramework, uiFramwork } = await promptUtils.expressPrompts()
       schema.isStupid = isStupid
       schema.apiArray = apiArray
