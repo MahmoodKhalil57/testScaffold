@@ -95,7 +95,6 @@ async function customPrompts() {
       message: "Which css framework would you like to include",
       choices: [
         "DaisyUi",
-        "Onu (beta)",
         "None"
       ]
     })
