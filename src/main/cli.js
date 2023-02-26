@@ -54,7 +54,7 @@ const cli = {
     return schema
   },
   createProject: async (schema, dirs) => {
-    createUtils.initCreate(schema, dirs)
+    await createUtils.initCreate(schema, dirs)
   }
 }
 

@@ -6,7 +6,7 @@
   "keywords": [],
   "license": "ISC",
   "scripts": {
-    "test:cli": "node ./bin/index.js",
+    "dev": "node ./bin/index.js",
     "test:install": "pnpm i -g --force && pnpm create test-scaffold"
   },
   "bin": {
@@ -18,7 +18,8 @@
     "figlet": "^1.5.2",
     "gradient-string": "^2.0.2",
     "inquirer": "^9.1.4",
-    "nanospinner": "^1.1.0"
+    "nanospinner": "^1.1.0",
+    "simple-git": "^3.16.1"
   },
   "repository": {
     "type": "git",
