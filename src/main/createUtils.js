@@ -12,7 +12,7 @@ const TAILWINDDAISYBRANCH = 'origin/TailwindDaisy' + __VERSION
 const TAILWINDFLOWBITEBRANCH = 'origin/TailwindFlowbite' + __VERSION
 
 const UNOBRANCH = 'origin/UnoCss' + __VERSION
-const UNODAISYBRANCH = 'origin/UnoDaisy' + __VERSION
+const UNODAISYBRANCH = 'origin/UnoCssDaisy' + __VERSION
 
 const cloneRepo = async (targetDir) => {
 
@@ -107,12 +107,16 @@ const mergeCss = async (dirs, css, gitMerge) => {
         await gitMerge.add("--all").commit(`Merge remote-tracking branch '${cssFrameworkBranch.replace("_", "+BaseUI_")}' into origin/Head`)
       })
     } else {
-      await gitMerge.merge(['--no-ff', cssUiFramworkBranch]).catch(async (err) => {
-        cssUiFramworkBranch === TAILWINDDAISYBRANCH ?
-          await resolveConflictTheirsRecursive(dirs.targetDir, cssUiFramworkBranch, err) :
-          await resolveConflictBothRecursive(dirs.targetDir, cssUiFramworkBranch, err)
+      let baseUIcssUiFramworkBranch = null
+      if (cssUiFramworkBranch === UNODAISYBRANCH) {
+        baseUIcssUiFramworkBranch = cssUiFramworkBranch.replace("_", "+PWA_")
+      }
+      await gitMerge.merge(['--no-ff', baseUIcssUiFramworkBranch ?? cssUiFramworkBranch]).catch(async (err) => {
+        baseUIcssUiFramworkBranch ?? cssUiFramworkBranch === TAILWINDDAISYBRANCH ?
+          await resolveConflictTheirsRecursive(dirs.targetDir, baseUIcssUiFramworkBranch ?? cssUiFramworkBranch, err) :
+          await resolveConflictBothRecursive(dirs.targetDir, baseUIcssUiFramworkBranch ?? cssUiFramworkBranch, err)
 
-        await gitMerge.add("--all").commit(`Merge remote-tracking branch '${cssUiFramworkBranch}' into origin/Head`)
+        await gitMerge.add("--all").commit(`Merge remote-tracking branch '${baseUIcssUiFramworkBranch ?? cssUiFramworkBranch}' into origin/Head`)
       })
       await gitMerge.merge(['--no-ff', cssUiFramworkBranch.replace("_", "+BaseUI_")]).catch(async (err) => {
       })
