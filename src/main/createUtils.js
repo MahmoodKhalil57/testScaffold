@@ -242,9 +242,9 @@ const fixPackage = async (dirs, schema) => {
   devDependencies = { ...devDependencies, ...DEPENDENCIES.init.dev, ...DEPENDENCIES.PWA.dev };
 
   console.log(schema)
-  if (schema?.apiArray)
-    for (let apiName in schema.apiArray) {
-      switch (apiName) {
+  if (schema?.apiArray.length)
+    for (let apiIndex in schema.apiArray) {
+      switch (schema.apiArray[apiIndex]) {
         case "TRPC":
           devDependencies = { ...devDependencies, ...DEPENDENCIES.TRPC.dev };
           dependencies = { ...dependencies, ...DEPENDENCIES.TRPC.dep };
