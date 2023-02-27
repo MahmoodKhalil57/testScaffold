@@ -259,7 +259,7 @@ const fixPackage = async (dirs, schema) => {
           devDependencies = { ...devDependencies, ...DEPENDENCIES.Prisma.dev };
           dependencies = { ...dependencies, ...DEPENDENCIES.Prisma.dep };
 
-          if (schema.apiArray[apiIndex + 1] === "AuthJs") {
+          if (schema.apiArray.includes("AuthJs")) {
             devDependencies = { ...devDependencies, ...DEPENDENCIES.Prisma_AuthJs.dev };
           }
           break;
