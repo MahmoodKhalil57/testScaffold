@@ -190,6 +190,12 @@ const fixPackage = async (dirs, schema) => {
       }
     },
 
+    Prisma_AuthJs: {
+      dev: {
+        "@next-auth/prisma-adapter": "^1.0.5",
+      },
+    },
+
     AuthJs: {
       dep: {
         "@auth/core": "^0.5.0",
@@ -252,6 +258,10 @@ const fixPackage = async (dirs, schema) => {
         case "Prisma":
           devDependencies = { ...devDependencies, ...DEPENDENCIES.Prisma.dev };
           dependencies = { ...dependencies, ...DEPENDENCIES.Prisma.dep };
+
+          if (schema.apiArray[apiIndex + 1] === "AuthJs") {
+            devDependencies = { ...devDependencies, ...DEPENDENCIES.Prisma_AuthJs.dev };
+          }
           break;
         case "AuthJs":
           dependencies = { ...dependencies, ...DEPENDENCIES.AuthJs.dep };
