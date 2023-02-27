@@ -165,13 +165,11 @@ const fixPackage = async (schema, targetDir) => {
 
 
   let dataJson = PACKAGEDATA.package
-  let dependenciesJson = { dependencies }
-  let devDependenciesJson = { devDependencies }
 
   dataJson.name = schema.appName
-  dataJson = { ...dataJson, devDependenciesJson }
+  dataJson = { ...dataJson, devDependencies }
   if (Object.keys(dependencies).length) {
-    dataJson = { ...dataJson, dependenciesJson }
+    dataJson = { ...dataJson, dependencies }
   }
 
   const targetPackagePath = path.join(targetDir, schema.appName, "/package.json")
