@@ -54,7 +54,9 @@ const cli = {
     return schema
   },
   createProject: async (schema, dirs) => {
-    await createUtils.initCreate(schema, dirs)
+    let gitMerge = await createUtils.cloneRepo(dirs?.targetDir)
+    await createUtils.mergeApi(schema.apiArray, gitMerge)
+    await createUtils.mergeCss(dirs, schema?.css, gitMerge)
   }
 }
 

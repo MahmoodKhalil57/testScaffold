@@ -14,18 +14,6 @@ const TAILWINDFLOWBITEBRANCH = 'origin/TailwindFlowbite' + __VERSION
 const UNOBRANCH = 'origin/UnoCss' + __VERSION
 const UNODAISYBRANCH = 'origin/UnoCssDaisy' + __VERSION
 
-const cloneRepo = async (targetDir) => {
-
-  const gitClone = simpleGit();
-  await gitClone.clone("https://github.com/MahmoodKhalil57/neo-t3-sveltekit-scaffold.git")
-  const gitMerge = simpleGit({ baseDir: path.join(targetDir, 'neo-t3-sveltekit-scaffold') });
-
-  await gitMerge.merge([PWABRANCH])
-  await gitMerge.merge([BASEUIBRANCH])
-
-  return gitMerge
-}
-
 const getCssBranch = (css) => {
   let frameworkBranch = null
   let uiBranch = null
@@ -42,11 +30,6 @@ const getCssBranch = (css) => {
       break;
   }
   return [frameworkBranch, uiBranch]
-}
-
-const mergeApi = async (apiArray, gitMerge) => {
-  //TODO
-  return gitMerge
 }
 
 const resolveConflict = (resolve, fileString, frameworkBranch) => {
@@ -89,6 +72,23 @@ const resolveConflictTheirsRecursive = async (targetDir, frameworkBranch, err) =
   });
 }
 
+const cloneRepo = async (targetDir) => {
+
+  const gitClone = simpleGit();
+  await gitClone.clone("https://github.com/MahmoodKhalil57/neo-t3-sveltekit-scaffold.git")
+  const gitMerge = simpleGit({ baseDir: path.join(targetDir, 'neo-t3-sveltekit-scaffold') });
+
+  await gitMerge.merge([PWABRANCH])
+  await gitMerge.merge([BASEUIBRANCH])
+
+  return gitMerge
+}
+
+const mergeApi = async (apiArray, gitMerge) => {
+  //TODO
+  return gitMerge
+}
+
 const mergeCss = async (dirs, css, gitMerge) => {
   let [cssFrameworkBranch, cssUiFramworkBranch] = getCssBranch(css)
 
@@ -126,20 +126,8 @@ const mergeCss = async (dirs, css, gitMerge) => {
   return gitMerge
 }
 
-const initCreate = async (schema, dirs) => {
-  console.log("Schema: ", schema)
-  console.log("dirs", dirs)
-
-  let gitMerge = await cloneRepo(dirs?.targetDir)
-
-  gitMerge = await mergeApi(schema.apiArray, gitMerge)
-
-  gitMerge = await mergeCss(dirs, schema?.css, gitMerge)
-
-  //Todo end stuff
-}
-
-
 export default {
-  initCreate
+  cloneRepo,
+  mergeApi,
+  mergeCss
 }
