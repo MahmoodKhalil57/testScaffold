@@ -254,7 +254,7 @@ const fixPackage = async (dirs, schema) => {
           dependencies = { ...dependencies, ...DEPENDENCIES.Prisma.dep };
           break;
         case "AuthJs":
-          devDependencies = { ...devDependencies, ...DEPENDENCIES.AuthJs.dev };
+          dependencies = { ...devDependencies, ...DEPENDENCIES.AuthJs.dep };
           break
         default:
           break
