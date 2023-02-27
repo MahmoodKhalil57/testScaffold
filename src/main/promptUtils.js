@@ -30,7 +30,7 @@ async function initPrompts() {
 
 async function customPrompts() {
   let isStupid = false
-  let apiArray = ["Trpc", "Prisma", "Auth.js"]
+  let apiArray = ["TRPC", "Prisma", "AuthJs"]
   let cssFramework = "None"
   let uiFramwork = "None"
 
@@ -55,9 +55,9 @@ async function customPrompts() {
     type: "checkbox",
     message: "Select libraries you wish to include",
     choices: [
-      "Trpc",
+      "TRPC",
       "Prisma",
-      "Auth.js"
+      "AuthJs"
     ]
   })
   apiArray = aa
@@ -111,7 +111,7 @@ async function customPrompts() {
 
 async function expressPrompts() {
   let isStupid = false
-  let apiArray = ["Trpc", "Prisma", "Auth.js"]
+  let apiArray = ["TRPC", "Prisma", "AuthJs"]
   let cssFramework = "None"
   let uiFramwork = "None"
 
@@ -127,10 +127,10 @@ async function expressPrompts() {
   })
   switch (ea) {
     case ("Full stack (Frontend + Backend + Database)"):
-      apiArray = ["Trpc", "Prisma", "Auth.js"]
+      apiArray = ["TRPC", "Prisma", "AuthJs"]
       break;
     case ("Frontend + Backend"):
-      apiArray = ["Trpc"]
+      apiArray = ["TRPC"]
       break;
     case ("Frontend only"):
       apiArray = []

@@ -33,7 +33,7 @@ const getCssBranch = (css) => {
 }
 
 const resolveConflict = (resolve, fileString, frameworkBranch) => {
-  const reg = new RegExp(`<<<<<<< HEAD|=======|>>>>>>>\\s${frameworkBranch}`, 'gm')
+  const reg = new RegExp(`<<<<<<< HEAD\r\\\n|=======\\r\\n|>>>>>>> ${frameworkBranch.replace("+", "\\+")}\\r\\n`, 'gm')
   let newArray = fileString.split(reg);
 
   let deleteHunk
@@ -85,11 +85,11 @@ const cloneRepo = async (targetDir) => {
 }
 
 const getApiBranch = (apiArray) => {
-  let branch = apiArray.join("") + "_BaseUI" + __VERSION
+  let branch = `origin/${apiArray.join("")}+BaseUI${__VERSION}`
   return branch
 }
 
-const mergeApi = async (apiArray, gitMerge) => {
+const mergeApi = async (dirs, apiArray, gitMerge) => {
   const apiBranch = getApiBranch(apiArray)
   await gitMerge.merge(['--no-ff', apiBranch]).catch(async (err) => {
     await resolveConflictBothRecursive(dirs.targetDir, apiBranch, err)
