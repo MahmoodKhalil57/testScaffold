@@ -1,30 +1,19 @@
 import { simpleGit } from 'simple-git';
 import path from 'path';
 import * as fs from 'fs';
-
-const __VERSION = "_V1.1.0"
-
-const PWABRANCH = 'origin/PWA' + __VERSION
-const BASEUIBRANCH = 'origin/BaseUI' + __VERSION
-
-const TAILWINDBRANCH = 'origin/Tailwind' + __VERSION
-const TAILWINDDAISYBRANCH = 'origin/TailwindDaisy' + __VERSION
-const TAILWINDFLOWBITEBRANCH = 'origin/TailwindFlowbite' + __VERSION
-
-const UNOBRANCH = 'origin/UnoCss' + __VERSION
-const UNODAISYBRANCH = 'origin/UnoCssDaisy' + __VERSION
+import { PACKAGEDATA, BRANCHES } from './constants.js'
 
 const getCssBranch = (css) => {
   let frameworkBranch = null
   let uiBranch = null
   switch (css.framework) {
     case "TailwindCss":
-      frameworkBranch = TAILWINDBRANCH
-      uiBranch = css.ui === "DaisyUi" ? TAILWINDDAISYBRANCH : css.ui === "FlowBite" ? TAILWINDFLOWBITEBRANCH : null
+      frameworkBranch = BRANCHES.TAILWINDBRANCH
+      uiBranch = css.ui === "DaisyUi" ? BRANCHES.TAILWINDDAISYBRANCH : css.ui === "FlowBite" ? BRANCHES.TAILWINDFLOWBITEBRANCH : null
       break;
     case "UnoCss":
-      frameworkBranch = UNOBRANCH
-      uiBranch = css.ui === "DaisyUi" ? UNODAISYBRANCH : null
+      frameworkBranch = BRANCHES.UNOBRANCH
+      uiBranch = css.ui === "DaisyUi" ? BRANCHES.UNODAISYBRANCH : null
       break;
     default:
       break;
@@ -50,8 +39,8 @@ const resolveConflict = (resolve, fileString, frameworkBranch) => {
   return newArray.join("")
 }
 
-const resolveConflictBothRecursive = async (targetDir, frameworkBranch, err) => {
-  targetDir = path.join(targetDir, "/neo-t3-sveltekit-scaffold/")
+const resolveConflictBothRecursive = async (schema, targetDir, frameworkBranch, err) => {
+  targetDir = path.join(targetDir, schema?.appName)
   err.git.merges.forEach(element => {
     let currTargetPath = path.join(targetDir, element)
 
@@ -61,8 +50,8 @@ const resolveConflictBothRecursive = async (targetDir, frameworkBranch, err) => 
   });
 }
 
-const resolveConflictTheirsRecursive = async (targetDir, frameworkBranch, err) => {
-  targetDir = path.join(targetDir, "/neo-t3-sveltekit-scaffold/")
+const resolveConflictTheirsRecursive = async (schema, targetDir, frameworkBranch, err) => {
+  targetDir = path.join(targetDir, schema?.appName)
   err.git.merges.forEach(element => {
     let currTargetPath = path.join(targetDir, element)
 
@@ -72,59 +61,58 @@ const resolveConflictTheirsRecursive = async (targetDir, frameworkBranch, err) =
   });
 }
 
-const cloneRepo = async (targetDir) => {
+const cloneRepo = async (targetDir, appName) => {
 
   const gitClone = simpleGit();
-  await gitClone.clone("https://github.com/MahmoodKhalil57/neo-t3-sveltekit-scaffold.git")
-  const gitMerge = simpleGit({ baseDir: path.join(targetDir, 'neo-t3-sveltekit-scaffold') });
+  await gitClone.clone("https://github.com/MahmoodKhalil57/neo-t3-sveltekit-scaffold.git", appName)
+  const gitMerge = simpleGit({ baseDir: path.join(targetDir, appName) });
 
-  await gitMerge.merge([PWABRANCH])
-  await gitMerge.merge([BASEUIBRANCH])
+  await gitMerge.merge([BRANCHES.PWABRANCH])
+  await gitMerge.merge([BRANCHES.BASEUIBRANCH])
 
   return gitMerge
 }
 
 const getApiBranch = (apiArray) => {
-  let branch = `origin/${apiArray.join("")}+BaseUI${__VERSION}`
+  let branch = `origin/${apiArray.join("") + BRANCHES.BASEUIINVBRANCH}`
   return branch
 }
 
-const mergeApi = async (dirs, apiArray, gitMerge) => {
-  const apiBranch = getApiBranch(apiArray)
+const mergeApi = async (schema, targetDir, gitMerge) => {
+  const apiBranch = getApiBranch(schema?.apiArray)
   await gitMerge.merge(['--no-ff', apiBranch]).catch(async (err) => {
-    await resolveConflictBothRecursive(dirs.targetDir, apiBranch, err)
+    await resolveConflictBothRecursive(schema, targetDir, apiBranch, err)
     await gitMerge.add("--all").commit(`Merge remote-tracking branch '${apiBranch}' into origin/Head`)
   })
-  return gitMerge
 }
 
-const mergeCss = async (dirs, css, gitMerge) => {
-  let [cssFrameworkBranch, cssUiFramworkBranch] = getCssBranch(css)
+const mergeCss = async (schema, targetDir, gitMerge) => {
+  let [cssFrameworkBranch, cssUiFramworkBranch] = getCssBranch(schema?.css)
 
   if (cssFrameworkBranch) {
     if (!cssUiFramworkBranch) {
-      if (cssFrameworkBranch === UNOBRANCH) {
+      if (cssFrameworkBranch === BRANCHES.UNOBRANCH) {
         await gitMerge.merge(['--no-ff', cssFrameworkBranch.replace("_", "+PWA_")]).catch(async (err) => {
-          await resolveConflictBothRecursive(dirs.targetDir, cssFrameworkBranch.replace("_", "+PWA_"), err)
+          await resolveConflictBothRecursive(schema, targetDir, cssFrameworkBranch.replace("_", "+PWA_"), err)
           await gitMerge.add("--all").commit(`Merge remote-tracking branch '${cssFrameworkBranch.replace("_", "+PWA_")}' into origin/Head`)
         })
       }
       await gitMerge.merge(['--no-ff', cssFrameworkBranch.replace("_", "+BaseUI_")]).catch(async (err) => {
-        await resolveConflictBothRecursive(dirs.targetDir, cssFrameworkBranch.replace("_", "+BaseUI_"), err)
+        await resolveConflictBothRecursive(schema, targetDir, cssFrameworkBranch.replace("_", "+BaseUI_"), err)
         await gitMerge.add("--all").commit(`Merge remote-tracking branch '${cssFrameworkBranch.replace("_", "+BaseUI_")}' into origin/Head`)
       })
     } else {
-      if (cssUiFramworkBranch === UNODAISYBRANCH) {
+      if (cssUiFramworkBranch === BRANCHES.UNODAISYBRANCH) {
         await gitMerge.merge(['--no-ff', cssUiFramworkBranch.replace("_", "+PWA_")]).catch(async (err) => {
-          await resolveConflictBothRecursive(dirs.targetDir, cssUiFramworkBranch.replace("_", "+PWA_"), err)
+          await resolveConflictBothRecursive(schema, targetDir, cssUiFramworkBranch.replace("_", "+PWA_"), err)
           await gitMerge.add("--all").commit(`Merge remote-tracking branch '${cssUiFramworkBranch.replace("_", "+PWA_")}' into origin/Head`)
 
         })
       }
       await gitMerge.merge(['--no-ff', cssUiFramworkBranch.replace("_", "+BaseUI_")]).catch(async (err) => {
-        cssUiFramworkBranch === TAILWINDDAISYBRANCH ?
-          await resolveConflictTheirsRecursive(dirs.targetDir, cssUiFramworkBranch.replace("_", "+BaseUI_"), err) :
-          await resolveConflictBothRecursive(dirs.targetDir, cssUiFramworkBranch.replace("_", "+BaseUI_"), err)
+        cssUiFramworkBranch === BRANCHES.TAILWINDDAISYBRANCH ?
+          await resolveConflictTheirsRecursive(schema, targetDir, cssUiFramworkBranch.replace("_", "+BaseUI_"), err) :
+          await resolveConflictBothRecursive(schema, targetDir, cssUiFramworkBranch.replace("_", "+BaseUI_"), err)
 
         await gitMerge.add("--all").commit(`Merge remote-tracking branch '${cssUiFramworkBranch.replace("_", "+BaseUI_")}' into origin/Head`)
       })
@@ -132,139 +120,29 @@ const mergeCss = async (dirs, css, gitMerge) => {
   }
 }
 
-const fixPackage = async (dirs, schema) => {
-  const DEPENDENCIES = {
-    init: {
-      dev: {
-        "@sveltejs/adapter-auto": "^2.0.0",
-        "@sveltejs/kit": "^1.5.0",
-        "@typescript-eslint/eslint-plugin": "^5.45.0",
-        "@typescript-eslint/parser": "^5.45.0",
-        "eslint": "^8.28.0",
-        "eslint-config-prettier": "^8.5.0",
-        "eslint-plugin-svelte3": "^4.0.0",
-        "prettier": "^2.8.0",
-        "prettier-plugin-svelte": "^2.8.1",
-        "svelte": "^3.54.0",
-        "svelte-check": "^3.0.1",
-        "tslib": "^2.4.1",
-        "typescript": "^4.9.3",
-        "vite": "^4.0.0"
-      }
-    },
-
-    PWA: {
-      dev: {
-        "@sveltejs/adapter-static": "^2.0.1",
-        "@types/cookie": "^0.5.1",
-        "@vite-pwa/sveltekit": "^0.1.3",
-        "svelte-preprocess": "^5.0.1",
-        "vite-plugin-pwa": "^0.14.4",
-        "workbox-precaching": "^6.5.4",
-        "workbox-routing": "^6.5.4",
-        "workbox-window": "^6.5.4"
-      }
-    },
-
-    TRPC: {
-      dev: {
-        "@sveltejs/adapter-node": "^1.2.0",
-      },
-      dep: {
-        "@trpc/client": "^10.12.0",
-        "@trpc/server": "^10.12.0",
-        "@types/ws": "^8.5.4",
-        "trpc-sveltekit": "^3.4.2",
-        "trpc-transformer": "^2.2.2",
-        "ws": "^8.12.1",
-        "zod": "^3.20.6"
-      }
-    },
-
-    Prisma: {
-      dev: {
-        "prisma": "^4.10.1",
-      },
-      dep: {
-        "@prisma/client": "^4.10.1"
-      }
-    },
-
-    Prisma_AuthJs: {
-      dev: {
-        "@next-auth/prisma-adapter": "^1.0.5",
-      },
-    },
-
-    AuthJs: {
-      dep: {
-        "@auth/core": "^0.5.0",
-        "@auth/sveltekit": "^0.2.2"
-      }
-    },
-
-    TailwindCss: {
-      dev: {
-        "autoprefixer": "^10.4.13",
-        "postcss": "^8.4.21",
-        "tailwindcss": "^3.2.7",
-      }
-    },
-
-    TailwindCss_DaisyUi: {
-      dep: {
-        "daisyui": "^2.51.1"
-      }
-    },
-
-    TailwindCss_FlowBite: {
-      dev: {
-        "flowbite": "^1.6.3",
-        "flowbite-svelte": "^0.30.4",
-      }
-    },
-
-    UnoCss: {
-      dev: {
-        "autoprefixer": "^10.4.13",
-        "postcss": "^8.4.21",
-        "postcss-load-config": "^4.0.1",
-        "svelte-preprocess": "^5.0.1",
-        "unocss": "^0.50.1",
-      }
-    },
-
-    UnoCss_DaisyUi: {
-      dev: {
-        "unocss-preset-daisy": "^1.2.0",
-        "@kidonng/daisyui": "2.50.1-0",
-      }
-    },
-  }
-
+const fixPackage = async (schema, targetDir) => {
   let devDependencies = {}
   let dependencies = {}
 
-  devDependencies = { ...devDependencies, ...DEPENDENCIES.init.dev, ...DEPENDENCIES.PWA.dev };
+  devDependencies = { ...devDependencies, ...PACKAGEDATA.init.dev, ...PACKAGEDATA.PWA.dev };
 
-  console.log(schema)
   if (schema?.apiArray.length)
     for (let apiIndex in schema.apiArray) {
       switch (schema.apiArray[apiIndex]) {
         case "TRPC":
-          devDependencies = { ...devDependencies, ...DEPENDENCIES.TRPC.dev };
-          dependencies = { ...dependencies, ...DEPENDENCIES.TRPC.dep };
+          devDependencies = { ...devDependencies, ...PACKAGEDATA.TRPC.dev };
+          dependencies = { ...dependencies, ...PACKAGEDATA.TRPC.dep };
           break;
         case "Prisma":
-          devDependencies = { ...devDependencies, ...DEPENDENCIES.Prisma.dev };
-          dependencies = { ...dependencies, ...DEPENDENCIES.Prisma.dep };
+          devDependencies = { ...devDependencies, ...PACKAGEDATA.Prisma.dev };
+          dependencies = { ...dependencies, ...PACKAGEDATA.Prisma.dep };
 
           if (schema.apiArray.includes("AuthJs")) {
-            devDependencies = { ...devDependencies, ...DEPENDENCIES.Prisma_AuthJs.dev };
+            devDependencies = { ...devDependencies, ...PACKAGEDATA.Prisma_AuthJs.dev };
           }
           break;
         case "AuthJs":
-          dependencies = { ...dependencies, ...DEPENDENCIES.AuthJs.dep };
+          dependencies = { ...dependencies, ...PACKAGEDATA.AuthJs.dep };
           break
         default:
           break
@@ -272,11 +150,11 @@ const fixPackage = async (dirs, schema) => {
     }
 
   if (schema?.css?.framework === "TailwindCss") {
-    devDependencies = { ...devDependencies, ...DEPENDENCIES.TailwindCss.dev };
+    devDependencies = { ...devDependencies, ...PACKAGEDATA.TailwindCss.dev };
     if (schema?.css?.ui === "FlowBite") {
-      devDependencies = { ...devDependencies, ...DEPENDENCIES.TailwindCss_FlowBite.dev };
+      devDependencies = { ...devDependencies, ...PACKAGEDATA.TailwindCss_FlowBite.dev };
     } else if (schema?.css?.ui === "DaisyUi") {
-      dependencies = { ...dependencies, ...DEPENDENCIES.TailwindCss_DaisyUi.dep };
+      dependencies = { ...dependencies, ...PACKAGEDATA.TailwindCss_DaisyUi.dep };
     }
   } else if (schema?.css.framework === "UnoCss") {
     devDependencies = { ...devDependencies, ...DEPENDENCIES.UnoCss.dev };
@@ -284,13 +162,20 @@ const fixPackage = async (dirs, schema) => {
       devDependencies = { ...devDependencies, ...DEPENDENCIES.UnoCss_DaisyUi.dev };
     }
   }
-  let data = fs.readFileSync(path.join(dirs.packageDir, "/src/main/packageTemplate.txt"), 'utf-8');
-  data = data.replace("[DEVDEP]", JSON.stringify({ devDependencies }, null, 2).slice(2, -2) + (Object.keys(dependencies).length ? ',' : ''))
-  data = data.replace("[DEP]", Object.keys(dependencies).length ? JSON.stringify({ dependencies }, null, 2).slice(2, -2) : '')
 
 
-  const targetPackagePath = path.join(dirs.targetDir, "/neo-t3-sveltekit-scaffold", "/package.json")
-  fs.writeFileSync(targetPackagePath, data, 'utf-8', 'w');
+  let dataJson = PACKAGEDATA.package
+  let dependenciesJson = { dependencies }
+  let devDependenciesJson = { devDependencies }
+
+  dataJson.name = schema.appName
+  dataJson = { ...dataJson, devDependenciesJson }
+  if (Object.keys(dependencies).length) {
+    dataJson = { ...dataJson, dependenciesJson }
+  }
+
+  const targetPackagePath = path.join(targetDir, schema.appName, "/package.json")
+  fs.writeFileSync(targetPackagePath, JSON.stringify(dataJson, null, 2), 'utf-8', 'w');
 }
 
 export default {
