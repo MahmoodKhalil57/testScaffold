@@ -57,6 +57,7 @@ const cli = {
     let gitMerge = await createUtils.cloneRepo(dirs?.targetDir)
     await createUtils.mergeApi(dirs, schema?.apiArray, gitMerge)
     await createUtils.mergeCss(dirs, schema?.css, gitMerge)
+    await createUtils.fixPackage(dirs, schema)
   }
 }
 
