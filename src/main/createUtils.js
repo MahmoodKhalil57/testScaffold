@@ -285,8 +285,8 @@ const fixPackage = async (dirs, schema) => {
     }
   }
   let data = fs.readFileSync(path.join(dirs.packageDir, "/src/main/packageTemplate.txt"), 'utf-8');
-  data = data.replace("[DEVDEP]", JSON.stringify({ devDependencies }, null, 2).slice(1, -1) + (Object.keys(dependencies).length ? ',' : ''))
-  data = data.replace("[DEP]", Object.keys(dependencies).length ? JSON.stringify({ dependencies }, null, 2).slice(1, -1) : '')
+  data = data.replace("[DEVDEP]", JSON.stringify({ devDependencies }, null, 2).slice(2, -2) + (Object.keys(dependencies).length ? ',' : ''))
+  data = data.replace("[DEP]", Object.keys(dependencies).length ? JSON.stringify({ dependencies }, null, 2).slice(2, -2) : '')
 
 
   const targetPackagePath = path.join(dirs.targetDir, "/neo-t3-sveltekit-scaffold", "/package.json")
