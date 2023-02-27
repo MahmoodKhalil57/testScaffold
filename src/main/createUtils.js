@@ -84,8 +84,17 @@ const cloneRepo = async (targetDir) => {
   return gitMerge
 }
 
+const getApiBranch = (apiArray) => {
+  let branch = apiArray.join("") + "_BaseUI" + __VERSION
+  return branch
+}
+
 const mergeApi = async (apiArray, gitMerge) => {
-  //TODO
+  const apiBranch = getApiBranch(apiArray)
+  await gitMerge.merge(['--no-ff', apiBranch]).catch(async (err) => {
+    await resolveConflictBothRecursive(dirs.targetDir, apiBranch, err)
+    await gitMerge.add("--all").commit(`Merge remote-tracking branch '${apiBranch}' into origin/Head`)
+  })
   return gitMerge
 }
 
@@ -93,37 +102,24 @@ const mergeCss = async (dirs, css, gitMerge) => {
   let [cssFrameworkBranch, cssUiFramworkBranch] = getCssBranch(css)
 
   if (cssFrameworkBranch) {
-    let baseUICssFrameworkBranch = null
-    if (cssFrameworkBranch === UNOBRANCH) {
-      baseUICssFrameworkBranch = cssFrameworkBranch.replace("_", "+PWA_")
-    }
-    await gitMerge.merge(['--no-ff', baseUICssFrameworkBranch ?? cssFrameworkBranch]).catch(async (err) => {
-      await resolveConflictBothRecursive(dirs.targetDir, baseUICssFrameworkBranch ?? cssFrameworkBranch, err)
-      await gitMerge.add("--all").commit(`Merge remote-tracking branch '${baseUICssFrameworkBranch ?? cssFrameworkBranch}' into origin/Head`)
-    })
     if (!cssUiFramworkBranch) {
       await gitMerge.merge(['--no-ff', cssFrameworkBranch.replace("_", "+BaseUI_")]).catch(async (err) => {
         await resolveConflictBothRecursive(dirs.targetDir, cssFrameworkBranch.replace("_", "+BaseUI_"), err)
         await gitMerge.add("--all").commit(`Merge remote-tracking branch '${cssFrameworkBranch.replace("_", "+BaseUI_")}' into origin/Head`)
       })
     } else {
-      let baseUIcssUiFramworkBranch = null
       if (cssUiFramworkBranch === UNODAISYBRANCH) {
-        baseUIcssUiFramworkBranch = cssUiFramworkBranch.replace("_", "+PWA_")
+        cssUiFramworkBranch = cssUiFramworkBranch.replace("_", "+PWA_")
       }
-      await gitMerge.merge(['--no-ff', baseUIcssUiFramworkBranch ?? cssUiFramworkBranch]).catch(async (err) => {
-        baseUIcssUiFramworkBranch ?? cssUiFramworkBranch === TAILWINDDAISYBRANCH ?
-          await resolveConflictTheirsRecursive(dirs.targetDir, baseUIcssUiFramworkBranch ?? cssUiFramworkBranch, err) :
-          await resolveConflictBothRecursive(dirs.targetDir, baseUIcssUiFramworkBranch ?? cssUiFramworkBranch, err)
-
-        await gitMerge.add("--all").commit(`Merge remote-tracking branch '${baseUIcssUiFramworkBranch ?? cssUiFramworkBranch}' into origin/Head`)
-      })
       await gitMerge.merge(['--no-ff', cssUiFramworkBranch.replace("_", "+BaseUI_")]).catch(async (err) => {
+        cssUiFramworkBranch === TAILWINDDAISYBRANCH ?
+          await resolveConflictTheirsRecursive(dirs.targetDir, cssUiFramworkBranch.replace("_", "+BaseUI_"), err) :
+          await resolveConflictBothRecursive(dirs.targetDir, cssUiFramworkBranch.replace("_", "+BaseUI_"), err)
+
+        await gitMerge.add("--all").commit(`Merge remote-tracking branch '${cssUiFramworkBranch.replace("_", "+BaseUI_")}' into origin/Head`)
       })
     }
   }
-
-  return gitMerge
 }
 
 export default {
