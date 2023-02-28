@@ -17,7 +17,7 @@ export const PACKAGEDATA = {
     "version": "0.0.1",
     "private": true,
     "scripts": {
-      "dev": "vite dev",
+      "dev": "vite dev --host 127.0.0.1",
       "build": "vite build",
       "preview": "vite preview",
       "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
