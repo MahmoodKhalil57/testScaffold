@@ -12,6 +12,7 @@ const main = async () => {
     dirs.packageDir = path.resolve(projectIndexDir, '../../')
     dirs.targetDir = process.cwd()
     await cli.createProject(schema, dirs)
+    await cli.finalizeProject(schema, dirs)
   }
 }
 

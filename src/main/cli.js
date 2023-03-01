@@ -1,5 +1,6 @@
 import promptUtils from './promptUtils.js'
 import createUtils from './createUtils.js'
+import finalizeUtils from './finalizeUtils.js'
 
 
 const cli = {
@@ -58,6 +59,16 @@ const cli = {
     await createUtils.mergeApi(schema, dirs?.targetDir, gitMerge)
     await createUtils.mergeCss(schema, dirs?.targetDir, gitMerge)
     await createUtils.fixPackage(schema, dirs?.targetDir)
+  },
+  finalizeProject: async (schema, dirs) => {
+
+    await finalizeUtils.gitInit(schema, dirs)
+    await finalizeUtils.addEnv(schema, dirs)
+
+    await finalizeUtils.pnpmInit(schema)
+    await finalizeUtils.prismaDbPush(schema)
+
+    // end screen
   }
 }
 
