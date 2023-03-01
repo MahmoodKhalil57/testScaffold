@@ -5,11 +5,11 @@ import { exec } from 'child_process'
 
 
 const gitInit = async (schema, dirs) => {
-  const dirPath = path.join(dirs?.targetDir, ".git")
+  const dirPath = path.join(dirs?.targetDir, schema?.appName, ".git")
   await fs.unlink(dirPath, (err => { }));
 
   // if(schema.gitInit)
-  const git = simpleGit(dirs.targetDir);
+  const git = await simpleGit(dirs?.targetDir);
   await git.init()
   await git.add("--all")
   await git.commit("init")
@@ -33,11 +33,11 @@ const addEnv = async (schema, dirs) => {
 }
 
 const pnpmInit = async (schema) => {
-  if (schema?.install) await exec(`cd ${schema.appName} && pnpm i`)
+  if (schema?.install) await exec(`cd ${schema?.appName} && pnpm i`)
 }
 
 const prismaDbPush = async (schema) => {
-  if (schema?.dbPush) await exec(`cd ${schema.appName} && pnpm prisma db push`)
+  if (schema?.dbPush) await exec(`cd ${schema?.appName} && pnpm prisma db push`)
 }
 
 export default {
