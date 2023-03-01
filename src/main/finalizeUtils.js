@@ -4,16 +4,17 @@ import * as fs from 'fs';
 import { exec } from 'child_process'
 
 
-const gitInit = async (schema, dirs) => {
-  const dirPath = path.join(dirs?.targetDir, schema?.appName, ".git")
-  await fs.unlink(dirPath, (err => { }));
+// const gitInit = async (schema, dirs) => {
+//   const dirPath = path.join(dirs?.targetDir, schema?.appName, ".git")
+//   await fs.unlink(dirPath, (err => { }));
 
-  // if(schema.gitInit)
-  const git = await simpleGit(dirs?.targetDir);
-  await git.init()
-  await git.add("--all")
-  await git.commit("init")
-}
+//   if (schema.gitInit) {
+//     const git = simpleGit(dirs?.targetDir);
+//     await git.init()
+//     await git.add("--all")
+//     await git.commit("init")
+//   }
+// }
 
 const addEnv = async (schema, dirs) => {
   let envContent = []
@@ -26,24 +27,18 @@ const addEnv = async (schema, dirs) => {
   if (schema?.apiArray?.includes("AuthJs")) envContent.push("AUTH_SECRET=" + base64String)
 
 
-  await fs.appendFile(dirs?.targetPath, envContent.join('\n\r'), function (err) {
+  await fs.appendFile(path.join(dirs?.targetDir, schema?.appName, '.env'), envContent.join('\n\r'), function (err) {
     if (err) throw err;
     console.log('Saved!');
   });
 }
 
-const pnpmInit = async (schema) => {
-  if (schema?.install) await exec(`cd ${schema?.appName} && pnpm i`)
+const pnpmfinit = async (schema) => {
+  if (schema?.install) await exec(`cd ${schema?.appName} ${schema?.dbPush ? '&& pnpm i && pnpm prisma db push' : ''}`)
 }
-
-const prismaDbPush = async (schema) => {
-  if (schema?.dbPush) await exec(`cd ${schema?.appName} && pnpm prisma db push`)
-}
-
 export default {
-  gitInit,
+  // gitInit,
   addEnv,
-  pnpmInit,
-  prismaDbPush,
+  pnpmfinit,
   // endScreen
 }

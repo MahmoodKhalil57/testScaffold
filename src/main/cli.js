@@ -62,11 +62,10 @@ const cli = {
   },
   finalizeProject: async (schema, dirs) => {
 
-    await finalizeUtils.gitInit(schema, dirs)
+    // await finalizeUtils.gitInit(schema, dirs)
     await finalizeUtils.addEnv(schema, dirs)
 
-    await finalizeUtils.pnpmInit(schema)
-    await finalizeUtils.prismaDbPush(schema)
+    await finalizeUtils.pnpmfinit(schema)
 
     // end screen
   }
